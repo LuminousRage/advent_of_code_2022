@@ -42,15 +42,11 @@ moveCrates crates (number, from, to) = update2
             update1 = updateCrates crates from newFrom
             update2 = updateCrates update1 to newTo
 
-doInstruction :: [Crate] -> [Instruction] -> [Crate]
-doInstruction crates [] = crates
-doInstruction crates (i:is) = doInstruction (moveCrates crates i) is
-
 main :: IO ()
 main = do
     input <- readFile inputPath
     let [crate, instructions] = splitOn "\n\n" input
         parsedCrates = map catMaybes $ transpose $ map (map parseCrate . chunksOf 4) $ lines crate
         parsedInstructions = map parseInstruction $ lines instructions
-        move = doInstruction parsedCrates parsedInstructions
+        move = foldl moveCrates parsedCrates parsedInstructions
     print $ map head move
